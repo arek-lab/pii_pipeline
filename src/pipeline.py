@@ -13,35 +13,23 @@ from .chunking import chunk_with_offsets, resolve_conflicts
 from .errors import InternalMaskingError
 from .masking import apply_masks, assert_length
 from .models import DetectRequest, DetectResponse, Span
-
-# TODO: uncomment when stages are implemented (Options B / C / D)
-# from .stages import regex_stage, ner_stage, teryt_stage
+from .stages import ner_stage, regex_stage, teryt_stage
 
 
 async def detect(request: DetectRequest) -> DetectResponse:
     text = request.text
+    # Chunking is used exclusively for NER (FastPDN token limit).
+    # Regex and TERYT run on the full text without chunking.
     chunks = chunk_with_offsets(text, max_chars=request.chunk_size)
 
-    # Stage 1 — regex (synchronous, full text via chunks for offset translation)
-    regex_spans: list[Span] = []
-    # TODO (Option B): implement regex_stage
-    # for chunk in chunks:
-    #     local = regex_stage.run(chunk.text)
-    #     regex_spans += [
-    #         Span(start=s.start + chunk.offset_start, end=s.end + chunk.offset_start,
-    #              label=s.label, source=s.source)
-    #         for s in local
-    #     ]
+    # Stage 1 — regex (synchronous, full text — no chunking needed)
+    regex_spans: list[Span] = regex_stage.run(text)
 
     # Stage 2 — NER (async, chunked, behind asyncio.Lock)
-    ner_spans: list[Span] = []
-    # TODO (Option C): implement ner_stage
-    # ner_spans = await ner_stage.run_chunked(text, chunks)
+    ner_spans: list[Span] = await ner_stage.run_chunked(text, chunks)
 
-    # Stage 3 — TERYT (synchronous, full text, no chunking)
-    teryt_spans: list[Span] = []
-    # TODO (Option D): implement teryt_stage
-    # teryt_spans = teryt_stage.run(text)
+    # Stage 3 — TERYT (synchronous, full text — no chunking needed)
+    teryt_spans: list[Span] = teryt_stage.run(text)
 
     all_spans = resolve_conflicts(regex_spans + ner_spans + teryt_spans)
 
