@@ -56,9 +56,9 @@ async def init_all() -> None:
     _morfeusz = morfeusz2.Morfeusz()
 
     import pandas as pd
-    simc = pd.read_csv("data/teryt/SIMC.csv", sep=";", encoding="utf-8")
+    simc = pd.read_csv("data/teryt/simc.csv", sep=";", encoding="utf-8")
     _teryt_simc = set(simc["NAZWA"].str.lower().str.strip())
-    ulic = pd.read_csv("data/teryt/ULIC.csv", sep=";", encoding="utf-8")
+    ulic = pd.read_csv("data/teryt/ulic.csv", sep=";", encoding="utf-8")
     _teryt_ulic = set(ulic["NAZWA_1"].str.lower().str.strip())
-    terc = pd.read_csv("data/teryt/TERC.csv", sep=";", encoding="utf-8")
+    terc = pd.read_csv("data/teryt/terc.csv", sep=";", encoding="utf-8")
     _teryt_terc = set(terc["NAZWA"].str.lower().str.strip())
