@@ -1,0 +1,8 @@
+services:
+  anonymize-api:
+    build: .
+    image: anonymize-api
+    container_name: anonymize-api
+    restart: unless-stopped
+    ports:
+      - "80:8000"
