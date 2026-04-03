@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import pipeline
 from .errors import InternalMaskingError
@@ -21,6 +22,12 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
 
 
 @app.post("/detect", response_model=DetectResponse)
@@ -33,7 +40,6 @@ async def detect_endpoint(request: DetectRequest) -> DetectResponse:
 
 @app.get("/health")
 async def health() -> dict:
-    # TODO: re-enable model checks once singletons.init_all loads real models
-    # if get_ner_model() is None or get_morfeusz() is None:
-    #     raise HTTPException(status_code=503, detail="Models not loaded")
+    if get_ner_model() is None or get_morfeusz() is None:
+        raise HTTPException(status_code=503, detail="Models not loaded")
     return {"status": "ok"}

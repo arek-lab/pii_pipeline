@@ -36,4 +36,4 @@ async def detect(request: DetectRequest) -> DetectResponse:
     masked = apply_masks(text, all_spans)
     assert_length(text, masked)  # raises InternalMaskingError on length violation
 
-    return DetectResponse(masked_text=masked)
+    return DetectResponse(masked_text=masked, detected=masked != text)

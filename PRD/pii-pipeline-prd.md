@@ -284,10 +284,40 @@ _PATTERNS: list[tuple[str, re.Pattern]] = [
     ("KOD_POCZTOWY",     re.compile(r'\b\d{2}-\d{3}\b')),
     ("NR_KARTY",         re.compile(r'\b(?:\d{4}[\s-]?){3}\d{4}\b')),
     ("NR_REJESTRACYJNY", re.compile(r'\b[A-Z]{2,3}[\s]?\d{4,5}\b|\b[A-Z]{2,3}[\s]?[A-Z0-9]{4,5}\b')),
-    ("DATA_URODZENIA",   re.compile(
-        r'(?:urodzon[ay]|ur\.?|data\s+urodzenia)\s*:?\s*'
-        r'(\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4}|\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2})',
-        re.I
+    ("DATA_URODZENIA", re.compile(
+        r'(?:'
+        # -- prefiksy słowne --
+        r'urodzon[aey]m?\s+dnia\b'   # "urodzonym", "urodzoną", "urodzonej"
+        r'|urodzon[ay]\b'
+        r'|data\s+ur\.?\s*:?'
+        r'|data\s+urodzenia\s*:?'
+        r'|ur\.?\s*:?'
+        r'|dob\s*:?'
+        r'|date\s+of\s+birth\s*:?'
+        r'|rocznik\b'
+        r'|ur\.\s+w\b'
+        r')\s*'
+
+        # -- data --
+        r'('
+        # DD.MM.YYYY  DD-MM-YYYY  DD/MM/YYYY
+        r'\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4}'
+        # YYYY-MM-DD  YYYY.MM.DD
+        r'|\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}'
+        # DD miesiąc_słownie YYYY  np. "3 maja 1990"
+        r'|\d{1,2}\s+(?:stycznia|lutego|marca|kwietnia|maja|czerwca|'
+        r'lipca|sierpnia|września|października|listopada|grudnia)\s+\d{4}'
+        r'(?:\s*r\.?)?'
+        # DD cyfra_rzymska YYYY  np. "3 V 1990"
+        r'|\d{1,2}\.?\s*(?:I{1,3}|IV|VI{0,3}|IX|XI{0,2}|XII)\.?\s+\d{4}'
+        # sam rok
+        r'|\d{4}(?:\s*r\.?)?'
+        r')'
+
+        # opcjonalne " r." po dacie (np. "15.06.1985 r.")
+        r'(?:\s*r\.)?',
+
+        re.IGNORECASE,
     )),
 ]
 

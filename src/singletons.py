@@ -41,27 +41,24 @@ async def init_all() -> None:
     """
     global _ner_model, _ner_lock, _morfeusz, _teryt_simc, _teryt_ulic, _teryt_terc
 
-    # TODO: Load NER model (requires 'ml' extras: transformers, torch)
-    # from transformers import pipeline as hf_pipeline
-    # _ner_model = hf_pipeline(
-    #     "ner",
-    #     model="clarin-pl/FastPDN",
-    #     aggregation_strategy="first",
-    #     device=0,
-    # )
+    from transformers import pipeline as hf_pipeline
+    _ner_model = hf_pipeline(
+        "ner",
+        model="clarin-pl/FastPDN",
+        aggregation_strategy="simple",
+        device=0,
+    )
 
     # asyncio.Lock must be created inside the running event loop
     _ner_lock = asyncio.Lock()
 
-    # TODO: Load Morfeusz2 (requires 'ml' extras: morfeusz2 + libmorfeusz2-dev)
-    # import morfeusz2
-    # _morfeusz = morfeusz2.Morfeusz()
+    import morfeusz2
+    _morfeusz = morfeusz2.Morfeusz()
 
-    # TODO: Load TERYT CSVs (requires 'ml' extras: pandas + data/teryt/*.csv)
-    # import pandas as pd
-    # simc = pd.read_csv("data/teryt/SIMC.csv", sep=";", encoding="utf-8")
-    # _teryt_simc = set(simc["NAZWA"].str.lower().str.strip())
-    # ulic = pd.read_csv("data/teryt/ULIC.csv", sep=";", encoding="utf-8")
-    # _teryt_ulic = set(ulic["NAZWA_1"].str.lower().str.strip())
-    # terc = pd.read_csv("data/teryt/TERC.csv", sep=";", encoding="utf-8")
-    # _teryt_terc = set(terc["NAZWA"].str.lower().str.strip())
+    import pandas as pd
+    simc = pd.read_csv("data/teryt/SIMC.csv", sep=";", encoding="utf-8")
+    _teryt_simc = set(simc["NAZWA"].str.lower().str.strip())
+    ulic = pd.read_csv("data/teryt/ULIC.csv", sep=";", encoding="utf-8")
+    _teryt_ulic = set(ulic["NAZWA_1"].str.lower().str.strip())
+    terc = pd.read_csv("data/teryt/TERC.csv", sep=";", encoding="utf-8")
+    _teryt_terc = set(terc["NAZWA"].str.lower().str.strip())

@@ -1,0 +1,16 @@
+Trzy encje nie zostały wykryte. Zbadaj każdą osobno:
+
+1. "Janem Kowalskim" — FastPDN nie wykrył osoby w formie narzędnika.
+   Sprawdź czy aggregation_strategy="first" scala tokeny poprawnie
+   dla odmienionych form. Przetestuj model bezpośrednio:
+   get_ner_model()("pomiędzy Janem Kowalskim, urodzonym")
+
+2. "15.06.1985" — regex DATA_URODZENIA nie złapał mimo słowa "urodzonym".
+   Wypisz wszystkie matche regex_stage.run() na fragmencie:
+   "urodzonym 15.06.1985 r."
+   Sprawdź czy pattern obsługuje "urodzonym" (forma narzędnikowa)
+   obok "urodzony/urodzona".
+
+Dla każdego problemu: najpierw diagnoza przez bezpośrednie wywołanie,
+potem minimalna poprawka, potem test na tym samym zdaniu: 
+""Umowa zawarta dnia 12.03.2024 r. w Warszawie pomiędzy Janem Kowalskim, urodzonym 15.06.1985 r., PESEL 85061512345, zamieszkałym przy ul. Lipowej 7 w Drzewie, a firmą Omega Solutions Sp. z o.o., NIP 527-283-14-22. Kontakt: jan.kowalski@gmail.com, tel. 604-123-456. Nr rejestracyjny pojazdu: WA12345. Nr karty: 4111 1111 1111 1111."

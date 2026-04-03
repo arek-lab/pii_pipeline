@@ -124,6 +124,7 @@ async def test_fixture_pesel_only():
     expected = "PESEL: -----------"
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +148,7 @@ async def test_fixture_email_only():
     expected = "email: --------------- koniec"
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -173,6 +175,7 @@ async def test_fixture_ner_person_name():
     expected = "Pani ---- ----- pracuje w ZUS."
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +200,7 @@ async def test_fixture_ner_organisation():
     expected = "firma --- ----- jest duza"
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -222,6 +226,7 @@ async def test_fixture_teryt_simc_inflected():
     expected = "Mieszka w -------."
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -250,6 +255,7 @@ async def test_fixture_teryt_terc_with_keyword():
     expected = text[:maz_start] + dashes + text[maz_end:]
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 async def test_fixture_teryt_terc_without_keyword_not_masked():
@@ -263,6 +269,7 @@ async def test_fixture_teryt_terc_without_keyword_not_masked():
     # No address keyword → no masking
     assert resp.masked_text == text
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is False
 
 
 # ---------------------------------------------------------------------------
@@ -293,6 +300,7 @@ async def test_fixture_combined_prd_example():
     expected = "--- --------, PESEL -----------, mieszka w -------."
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -322,6 +330,7 @@ async def test_fixture_nip_and_ner_org():
     expected = "NIP ---------- firmy ---"
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -353,6 +362,7 @@ async def test_fixture_conflict_ner_beats_teryt():
     expected = "Pani ----- mieszka tu."
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -385,6 +395,7 @@ async def test_fixture_conflict_longer_span_wins():
     expected = text[:email_start] + dashes + text[email_end:]
     assert resp.masked_text == expected
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is True
 
 
 # ---------------------------------------------------------------------------
@@ -398,6 +409,7 @@ async def test_fixture_no_pii_text_unchanged():
     resp = await run_pipeline(text)
     assert resp.masked_text == text
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is False
 
 
 # ---------------------------------------------------------------------------
@@ -456,6 +468,7 @@ async def test_fixture_ner_placename_and_date_filtered():
     # placeName → filtered; date → filtered; no regex/teryt hits either
     assert resp.masked_text == text
     assert len(resp.masked_text) == len(text)
+    assert resp.detected is False
 
 
 # ---------------------------------------------------------------------------
@@ -531,7 +544,9 @@ async def test_http_detect_returns_200(monkeypatch):
     assert resp.status_code == 200
     body = resp.json()
     assert "masked_text" in body
+    assert "detected" in body
     assert len(body["masked_text"]) == len(text)
+    assert body["detected"] is True  # PESEL is PII
 
 
 async def test_http_detect_empty_text_returns_422():

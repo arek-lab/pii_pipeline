@@ -5,7 +5,10 @@
       "Bash(uv run:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(.venv/Scripts/python.exe:*)"
+      "Bash(.venv/Scripts/python.exe:*)",
+      "Bash(uv pip:*)",
+      "Bash(.venv/Scripts/uvicorn.exe src.main:app:*)",
+      "Bash(curl:*)"
     ]
   }
 }

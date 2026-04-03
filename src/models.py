@@ -28,6 +28,7 @@ class DetectRequest(BaseModel):
 
 class DetectResponse(BaseModel):
     masked_text: str
+    detected: bool
 
 
 class Span(BaseModel):

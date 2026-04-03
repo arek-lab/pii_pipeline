@@ -377,6 +377,13 @@ class TestDataUrodzenia:
         assert len(s) == 1
         assert text[s[0].start : s[0].end] == "2000/01/01"
 
+    def test_urodzonym_instrumental_case(self):
+        # Instrumental masculine form — most common in legal documents
+        text = "urodzonym 15.06.1985 r."
+        s = self._spans(text)
+        assert len(s) == 1
+        assert text[s[0].start : s[0].end] == "15.06.1985"
+
     def test_span_does_not_include_keyword(self):
         text = "urodzona 15.03.1985"
         s = self._spans(text)

@@ -21,7 +21,7 @@ _PATTERNS: list[tuple[str, re.Pattern]] = [
     (
         "DATA_URODZENIA",
         re.compile(
-            r"(?:urodzon[ay]|ur\.?|data\s+urodzenia)\s*:?\s*"
+            r"(?:urodzon(?:y|a|ym)|ur\.?|data\s+urodzenia)\s*:?\s*"
             r"(\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4}|\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2})",
             re.I,
         ),

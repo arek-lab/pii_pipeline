@@ -15,13 +15,20 @@ from ..models import Span
 from ..singletons import get_ner_lock, get_ner_model
 
 # FastPDN entity groups → internal labels.
-# None = filtered out (handled by a different stage).
-# A list value means the entity covers multiple roles — collapsed to "OSOBA".
+# Keys are the actual entity_group values returned by clarin-pl/FastPDN
+# (aggregation_strategy strips the B-/I- prefix and returns the bare type name).
+# Keys absent from this dict are implicitly filtered (same as None).
 NER_LABEL_MAP: dict[str, str | list[str] | None] = {
-    "persName":  ["IMIE", "NAZWISKO"],  # full person name — mask as one span
-    "orgName":   "ORG",
-    "placeName": None,   # ignored — addresses handled by TERYT stage (more precise)
-    "date":      None,   # ignored — birth dates handled by regex with keyword context
+    # Person names — mask first+last name as one span
+    "nam_liv_person":          ["IMIE", "NAZWISKO"],
+    # Organisations
+    "nam_org_company":         "ORG",
+    "nam_org_institution":     "ORG",
+    "nam_org_group":           "ORG",
+    "nam_org_organization":    "ORG",
+    "nam_org_political_party": "ORG",
+    # All location/address groups → None (TERYT stage is more precise for Polish)
+    # All other groups (nam_oth, nam_fac_*, nam_loc_*, nam_num_*, ...) → also None
 }
 
 
@@ -40,6 +47,8 @@ async def run(text: str) -> list[Span]:
     lock = get_ner_lock()
 
     def _infer() -> list[dict]:
+        if model is None:
+            raise RuntimeError("NER model not loaded — init_all() did not complete")
         return model(text)
 
     async with lock:
